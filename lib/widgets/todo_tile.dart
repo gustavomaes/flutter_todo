@@ -24,17 +24,22 @@ class ToDoTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Checkbox(
-              value: true,
-              onChanged: (value) {},
-              activeColor: Colors.white,
+              value: isCompleted,
+              onChanged: onChange,
+              fillColor: MaterialStateProperty.all<Color>(Colors.white),
+              checkColor: Colors.black,
             ),
             Expanded(
               child: Text(
                 taskName,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  decoration: isCompleted
+                      ? TextDecoration.lineThrough
+                      : TextDecoration.none,
+                ),
               ),
             )
           ],
