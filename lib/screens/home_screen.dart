@@ -41,6 +41,12 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.of(context).pop();
   }
 
+  void onDelete(int index) {
+    setState(() {
+      todoList.removeAt(index);
+    });
+  }
+
   void onCancel() {
     Navigator.of(context).pop();
   }
@@ -76,9 +82,11 @@ class _HomeScreenState extends State<HomeScreen> {
       body: ListView.builder(
         itemCount: todoList.length,
         itemBuilder: (context, index) => ToDoTile(
-            taskName: todoList[index].name,
-            isCompleted: todoList[index].isCompleted,
-            onChange: (value) => onChange(value, index)),
+          taskName: todoList[index].name,
+          isCompleted: todoList[index].isCompleted,
+          onChange: (value) => onChange(value, index),
+          onDelete: (context) => onDelete(index),
+        ),
       ),
     );
   }
