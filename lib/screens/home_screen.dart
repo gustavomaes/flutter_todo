@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:todo_list/data/database.dart';
+import 'package:todo_list/models/todo.dart';
 import 'package:todo_list/widgets/add_task.dart';
 import 'package:todo_list/widgets/todo_tile.dart';
-
-class ToDo {
-  String name;
-  bool isCompleted;
-
-  ToDo({required this.name, required this.isCompleted});
-}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -18,33 +14,43 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _controller = TextEditingController();
-  List<ToDo> todoList = [
-    ToDo(name: 'task 1', isCompleted: false),
-    ToDo(name: 'task 2', isCompleted: true),
-    ToDo(name: 'task 3', isCompleted: true),
-    ToDo(name: 'task 4', isCompleted: false),
-  ];
+  final _box = Hive.box('mybox');
+  ToDoDatabase db = ToDoDatabase();
+
+  @override
+  void initState() {
+    if (_box.get("TODOLIST") == null) {
+      db.createInitialData();
+    } else {
+      db.loadData();
+    }
+
+    super.initState();
+  }
 
   void onChange(bool? value, int index) {
     setState(() {
-      todoList[index].isCompleted = !todoList[index].isCompleted;
+      db.todoList[index].isCompleted = !db.todoList[index].isCompleted;
     });
+    db.updateDataBase();
   }
 
   void onSave() {
     if (_controller.text.isNotEmpty) {
       setState(() {
-        todoList.add(ToDo(name: _controller.text, isCompleted: false));
+        db.todoList.add(ToDo(name: _controller.text, isCompleted: false));
       });
       _controller.text = "";
     }
+    db.updateDataBase();
     Navigator.of(context).pop();
   }
 
   void onDelete(int index) {
     setState(() {
-      todoList.removeAt(index);
+      db.todoList.removeAt(index);
     });
+    db.updateDataBase();
   }
 
   void onCancel() {
@@ -80,10 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: ListView.builder(
-        itemCount: todoList.length,
+        itemCount: db.todoList.length,
         itemBuilder: (context, index) => ToDoTile(
-          taskName: todoList[index].name,
-          isCompleted: todoList[index].isCompleted,
+          taskName: db.todoList[index].name,
+          isCompleted: db.todoList[index].isCompleted,
           onChange: (value) => onChange(value, index),
           onDelete: (context) => onDelete(index),
         ),
